@@ -300,32 +300,10 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
     $areas = $politicaldata;
   }
 
-		//European Region
-		$eurvalue = politicaldata_searchForType('EUR',$areas);
-		$regionalauthority = $areas[$eurvalue]['name'];
-		$ukcountry = $areas[$eurvalue]['country_name'];
-		
-		//Welsh Assembly Region
-		$waevalue = politicaldata_searchForType('WAE',$areas);
-		$welshassemblyregion = $areas[$waevalue]['name'];
-		
-		//Welsh Assembly Constituency
-		$wacvalue = politicaldata_searchForType('WAC',$areas);
-		$welshassemblycon = $areas[$wacvalue]['name'];
-		
-		//Scottish Parliament Constituency
-		$spcvalue = politicaldata_searchForType('SPC',$areas);
-		$scottishparlcon = $areas[$spcvalue]['name'];
+  $areaNames = mapAreaTypesToNames($areas);
 
-		//Scottish Parliament Region
-		$spevalue = politicaldata_searchForType('SPE',$areas);
-		$scottishparlreg = $areas[$spevalue]['name'];
-		
-		//London Assembly Constituency
-		$lacvalue = politicaldata_searchForType('LAC',$areas);
-		$londonassembly = $areas[$lacvalue]['name'];
-		
-		 // assign to the custom fields
+  $ccg = $areaNames['CCG'];
+
 		 $customParams = array(
 			 "id" => $contact_id,
 			 "sequential" => 1,
