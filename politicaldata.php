@@ -7,7 +7,8 @@ require_once 'politicaldata.civix.php';
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_config
  */
-function politicaldata_civicrm_config(&$config) {
+function politicaldata_civicrm_config(&$config)
+{
   _politicaldata_civix_civicrm_config($config);
 }
 
@@ -18,7 +19,8 @@ function politicaldata_civicrm_config(&$config) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_xmlMenu
  */
-function politicaldata_civicrm_xmlMenu(&$files) {
+function politicaldata_civicrm_xmlMenu(&$files)
+{
   _politicaldata_civix_civicrm_xmlMenu($files);
 }
 
@@ -27,7 +29,8 @@ function politicaldata_civicrm_xmlMenu(&$files) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_install
  */
-function politicaldata_civicrm_install() {
+function politicaldata_civicrm_install()
+{
   _politicaldata_civix_civicrm_install();
 }
 
@@ -36,7 +39,8 @@ function politicaldata_civicrm_install() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_uninstall
  */
-function politicaldata_civicrm_uninstall() {
+function politicaldata_civicrm_uninstall()
+{
   _politicaldata_civix_civicrm_uninstall();
 }
 
@@ -45,7 +49,8 @@ function politicaldata_civicrm_uninstall() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_enable
  */
-function politicaldata_civicrm_enable() {
+function politicaldata_civicrm_enable()
+{
   _politicaldata_civix_civicrm_enable();
 }
 
@@ -54,7 +59,8 @@ function politicaldata_civicrm_enable() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_disable
  */
-function politicaldata_civicrm_disable() {
+function politicaldata_civicrm_disable()
+{
   _politicaldata_civix_civicrm_disable();
 }
 
@@ -69,7 +75,8 @@ function politicaldata_civicrm_disable() {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_upgrade
  */
-function politicaldata_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
+function politicaldata_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL)
+{
   return _politicaldata_civix_civicrm_upgrade($op, $queue);
 }
 
@@ -81,7 +88,8 @@ function politicaldata_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_managed
  */
-function politicaldata_civicrm_managed(&$entities) {
+function politicaldata_civicrm_managed(&$entities)
+{
   _politicaldata_civix_civicrm_managed($entities);
 }
 
@@ -94,7 +102,8 @@ function politicaldata_civicrm_managed(&$entities) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_caseTypes
  */
-function politicaldata_civicrm_caseTypes(&$caseTypes) {
+function politicaldata_civicrm_caseTypes(&$caseTypes)
+{
   _politicaldata_civix_civicrm_caseTypes($caseTypes);
 }
 
@@ -103,7 +112,8 @@ function politicaldata_civicrm_caseTypes(&$caseTypes) {
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
  */
-function politicaldata_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
+function politicaldata_civicrm_alterSettingsFolders(&$metaDataFolders = NULL)
+{
   _politicaldata_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
