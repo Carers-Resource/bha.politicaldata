@@ -171,131 +171,135 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
   ));
 
   $apikey = array_key_exists('mapitkey', $result['values'][0]) ? $result['values'][0]['mapitkey'] : '';
-		
-		$apikey = $result['values'][0]['mapitkey'];
-				
-		//check whether we're using lat/long or postcode
-		$usingLatLong = false;
+
+  //check whether we're using lat/long or postcode
+  $usingLatLong = false;
 
 
-		//BHA: check if it's a local group
-		$contactType = civicrm_api3('Contact', 'get', array(
-		  'sequential' => 1,
-		  'return' => "contact_sub_type",
-		  'id' => $contact_id,
-		));
-		$contactType = $contactType[values][0]['contact_sub_type'][0];
-		if ($contactType == 'LocalGroup') {
-			$usingLatLong = true;
-		}
-		
-		if ($usingLatLong){
-			
-			$lat = $objectref->geo_code_1;
-			$long = $objectref->geo_code_2;
-			$url='https://mapit.mysociety.org/point/4326/' . $long . ',' . $lat;
-			
+  //BHA: check if it's a local group
+  $contactType = civicrm_api3('Contact', 'getsingle', array(
+    'sequential' => 1,
+    'return' => "contact_sub_type",
+    'id' => $contact_id,
+  ));
+  $contactSubType = $contactType['contact_sub_type'];
+  if ($contactSubType == 'LocalGroup') {
+    $usingLatLong = true;
+  }
+
+  if ($usingLatLong) {
+
+    $lat = $objectref->geo_code_1;
+    $long = $objectref->geo_code_2;
+    $url = 'https://mapit.mysociety.org/point/4326/' . $long . ',' . $lat;
+
+    //if api key, use it. Otherwise this'll default to the no-api-key 50/day version
 			//if api key, use it. Otherwise this'll default to the no-api-key 50/day version	
-			if ($apikey) {
+    //if api key, use it. Otherwise this'll default to the no-api-key 50/day version
+    if ($apikey) {
+      $url .= '?api_key=' . $apikey;
 				$url .= '?api_key=' . $apikey; 
-			}
-			
-		} else { //postcodes
-			
-			//tidy up postcode
-			$postcode=str_replace(' ','',$postcode);
-			
-			$url='https://mapit.mysociety.org/postcode/' . $postcode;
-			if ($apikey) {
+      $url .= '?api_key=' . $apikey;
+    }
+  } else {
+    $url = 'https://mapit.mysociety.org/postcode/' . $postcode;
+    if ($apikey) {
+      $url .= '?api_key=' . $apikey;
 				$url .= '?api_key=' . $apikey; 
-			}
-			
-		}
-		
-		
-		//fetch data from mapit
+      $url .= '?api_key=' . $apikey;
+    }
+  }
 
-		//Initiate curl
-		$ch = curl_init();
-		//Return the response as a string (if false it prints the response)
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		//set 4 seconds max wait time
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,4);
-		//set the url
-		curl_setopt($ch, CURLOPT_URL,$url);
-		//execute
-		$result=curl_exec($ch);
-		//convert result json to array
-		$politicaldata = json_decode($result, true);
-		
-		//bail if no data
-		if(!$politicaldata) {
-			error_log('mapit returning no data');
-			
-			if(curl_errno($ch)){
-		   error_log('Curl error: ' . curl_error($ch));
-			}
-			
-			$foo = print_r(curl_getinfo($ch),true);
-			error_log($foo);
-			
-			return;
-		}
-			
-		//get appropriate ward and council, depending on whether it's a unitary authority
-		//TODO: this doesn't work for lat/long lookups
-		$isward = 1;
-		if (politicaldata_array_key_exists_r('county',$politicaldata)) {
-			$isward = 0;
-			$wardcountyid = $politicaldata['shortcuts']['ward']['county'];
-			$warddistrictid = $politicaldata['shortcuts']['ward']['district'];
-		} else {
-			$wardid = $politicaldata['shortcuts']['ward'];
-		}
-		
-		$iscouncil = 1;
-		if (politicaldata_array_key_exists_r('county',$politicaldata)) {
-			$iscouncil = 0;
-			$councilcountyid = $politicaldata['shortcuts']['council']['county'];
-			$councildistrictid = $politicaldata['shortcuts']['council']['district'];
-		} else {
-			$councilid = $politicaldata['shortcuts']['council'];
-		}
-		
-		//Parliamentary Constituency
-		$constituencyid = $politicaldata['shortcuts']['WMC'];
 
-		
-		//assign values for Council and Local Authority
-		$constituency = $politicaldata['areas'][$constituencyid]['name'];
-		
-		if ($iscouncil == 1) {
-			$highestla = $politicaldata['areas'][$councilid]['name'];
-		} else {
-			$highestla = $politicaldata['areas'][$councilcountyid]['name'];
-		}
-		
-		if ($iscouncil == 1) {
-			$secondhighestla = '';
-		} else {
-			$secondhighestla = $politicaldata['areas'][$councildistrictid]['name'];
-		}
-		
-		if ($isward == 1) {
-			$ward = $politicaldata['areas'][$wardid]['name'];
-		} else {
-			$ward = $politicaldata['areas'][$warddistrictid]['name'];
-		}
-				
-				
-		//for all others it's identical (afaik), so can search directly
-		//starts working for latlong at this point, as latlong lookups only have the 'areas' array
-		if($politicaldata['areas']) {
+  //fetch data from mapit
+
+  //Initiate curl
+  $ch = curl_init();
+  //Return the response as a string (if false it prints the response)
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  //set 4 seconds max wait time
+  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 4);
+  //set the url
+  curl_setopt($ch, CURLOPT_URL, $url);
+  //execute
+  $result = curl_exec($ch);
+  //convert result json to array
+  $politicaldata = json_decode($result, true);
+
+  //bail if no data
+  if (!$politicaldata) {
+    error_log('mapit returning no data');
+
+    if (curl_errno($ch)) {
+      error_log('Curl error: ' . curl_error($ch));
+    }
+
+    $foo = print_r(curl_getinfo($ch), true);
+    error_log($foo);
+
+    return;
+  }
+
+  //get appropriate ward and council, depending on whether it's a unitary authority
+  //TODO: this doesn't work for lat/long lookups
+  $isward = 1;
+  if (politicaldata_array_key_exists_r('county', $politicaldata)) {
+    $isward = 0;
+    $wardcountyid = $politicaldata['shortcuts']['ward']['county'];
+    $warddistrictid = $politicaldata['shortcuts']['ward']['district'];
+  } else {
+    $wardid = $politicaldata['shortcuts']['ward'];
+  }
+
+  $iscouncil = 1;
+  $councilcountyid = '000';
+  if (politicaldata_array_key_exists_r('county', $politicaldata)) {
+    $iscouncil = 0;
+    $councilcountyid = $politicaldata['shortcuts']['council']['county'];
+    $councildistrictid = $politicaldata['shortcuts']['council']['district'];
+  } else {
+    $councilid = $politicaldata['shortcuts']['council'];
+  }
+
+  //Parliamentary Constituency
+  $constituencyid = $politicaldata['shortcuts']['WMC'];
+
+
+  //assign values for Council and Local Authority
+  $constituency = $politicaldata['areas'][$constituencyid]['name'];
+  if (array_key_exists($councilcountyid, $politicaldata['areas'])) {
+    $highestla = $politicaldata['areas'][$councilcountyid]['name'];
+  }
+
+  if ($iscouncil == 1) {
+    $highestla = $politicaldata['areas'][$councilid]['name'];
+  }
+
+  if ($iscouncil == 1) {
+    $secondhighestla = '';
+  } else {
+    $secondhighestla = $politicaldata['areas'][$councildistrictid]['name'];
+  }
+
+  $la = !isset($secondhighestla) ? $secondhighestla : $highestla;
+
+  if ($isward == 1) {
+    $ward = $politicaldata['areas'][$wardid]['name'];
+  } else {
+    $ward = $politicaldata['areas'][$warddistrictid]['name'];
+  }
+
+
+  //for all others it's identical (afaik), so can search directly
+  //starts working for latlong at this point, as latlong lookups only have the 'areas' array
+  if ($politicaldata['areas']) {
+    $areas = $politicaldata['areas'];
 			$areas = $politicaldata['areas'];	
-		} else {
-			$areas = $politicaldata;
-		}
-		
+    $areas = $politicaldata['areas'];
+  } else {
+    $areas = $politicaldata;
+  }
+
 		//European Region
 		$eurvalue = politicaldata_searchForType('EUR',$areas);
 		$regionalauthority = $areas[$eurvalue]['name'];
