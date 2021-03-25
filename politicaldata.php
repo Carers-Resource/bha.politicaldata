@@ -170,6 +170,7 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
     'return' => array("mapitkey"),
   ));
 
+  $apikey = array_key_exists('mapitkey', $result['values'][0]) ? $result['values'][0]['mapitkey'] : '';
 		
 		$apikey = $result['values'][0]['mapitkey'];
 				
