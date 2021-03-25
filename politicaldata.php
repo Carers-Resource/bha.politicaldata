@@ -126,6 +126,18 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
   defined('MAPIT_CCG') ?: define('MAPIT_CCG', '18');
   defined('MAPIT_CONSTITUENCY') ?: define('MAPIT_CONSTITUENCY', '19');
 
+  if ($objectName != 'Address') {
+    return;
+  }
+
+  if (!in_array($op, array('create', 'edit'))) {
+    return;
+  }
+
+  if ($objectref->is_primary != 1) {
+    return;
+  }
+
 		$contact_id = $objectref->contact_id;
 		$postcode = $objectref->postal_code;
 		$country = $objectref->country_id;
