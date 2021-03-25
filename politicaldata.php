@@ -138,37 +138,38 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
     return;
   }
 
-		$contact_id = $objectref->contact_id;
-		$postcode = $objectref->postal_code;
-		$country = $objectref->country_id;
-		
-		//bail if no postcode
+  $contact_id = $objectref->contact_id;
+  $postcode = $objectref->postal_code;
+  $country = $objectref->country_id;
+
+  //bail if no postcode
+  if (!isset($postcode) or empty($postcode)) {
   	if (!isset($postcode) or empty($postcode)) { 
-  		return;
-  	}
-  	
-  	//bail if the country explicitly isn't the UK. If there isn't a country try anyway
-	 	if (isset($country) AND $country != 1226) { 
+  if (!isset($postcode) or empty($postcode)) {
+    return;
+  }
+
+  //bail if the country explicitly isn't the UK. If there isn't a country try anyway
+  if (isset($country) and $country != 'null' and $country != 1226) {
+    return;
 	 		return; 
+    return;
+  }
 	 	} 
+  }
 
-			
-		//bail if there's no contact ID (creating locations on the Manage Event page seems to do this)
-		if (!$contact_id) {
-			return;
-		}
 
-		//bail if it's not their primary addresses	
-		if ($objectref->is_primary != 1){ 
-			return;
-		}
+  //bail if there's no contact ID (creating locations on the Manage Event page seems to do this)
+  if (!$contact_id) {
+    return;
+  }
 
-		//get API key from db (set via civicrm/mapit/settings)
-  	$result = civicrm_api3('Setting', 'get', array(
-		  'sequential' => 1,
-		  'return' => array("mapitkey"),
-		));
-		
+  //get API key from db (set via civicrm/mapit/settings)
+  $result = civicrm_api3('Setting', 'get', array(
+    'sequential' => 1,
+    'return' => array("mapitkey"),
+  ));
+
 		
 		$apikey = $result['values'][0]['mapitkey'];
 				
