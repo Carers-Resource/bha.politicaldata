@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
-<extension key="bha.politicaldata" type="module">
+<extension key="cr.politicaldata" type="module">
   <file>politicaldata</file>
-  <name>BHA: Mapit (Political Data)</name>
+  <name>Mapit integration - Carers' Resource version</name>
   <description>Fetch political data from mapit</description>
   <license>AGPL-3.0</license>
   <maintainer>
-    <author>Andrew West</author>
-    <email>website@humanism.org.uk</email>
+    <author>Gav Massingham</author>
+    <email>web@carersresource.org</email>
   </maintainer>
-  <version>1.0</version>
-  <develStage>Stable</develStage>
+  <version>1.1</version>
+  <develStage>Development</develStage>
   <compatibility>
     <ver>4.4</ver>
   </compatibility>

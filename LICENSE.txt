@@ -1,4 +1,4 @@
-Package: bha.politicaldata
+Package: cr.politicaldata
 Copyright (C) 2014, FIXME <FIXME>
 Licensed under the GNU Affero Public License 3.0 (below).
 

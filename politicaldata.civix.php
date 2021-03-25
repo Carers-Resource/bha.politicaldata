@@ -6,9 +6,10 @@
  * The ExtensionUtil class provides small stubs for accessing resources of this
  * extension.
  */
-class CRM_Politicaldata_ExtensionUtil {
+class CRM_Politicaldata_ExtensionUtil
+{
   const SHORT_NAME = 'politicaldata';
-  const LONG_NAME = 'bha.politicaldata';
+  const LONG_NAME = 'cr.politicaldata';
   const CLASS_PREFIX = 'CRM_Politicaldata';
 
   /**
@@ -24,7 +25,8 @@ class CRM_Politicaldata_ExtensionUtil {
    *   Translated text.
    * @see ts
    */
-  public static function ts($text, $params = []) {
+  public static function ts($text, $params = [])
+  {
     if (!array_key_exists('domain', $params)) {
       $params['domain'] = [self::LONG_NAME, NULL];
     }
@@ -41,7 +43,8 @@ class CRM_Politicaldata_ExtensionUtil {
    *   Ex: 'http://example.org/sites/default/ext/org.example.foo'.
    *   Ex: 'http://example.org/sites/default/ext/org.example.foo/css/foo.css'.
    */
-  public static function url($file = NULL) {
+  public static function url($file = NULL)
+  {
     if ($file === NULL) {
       return rtrim(CRM_Core_Resources::singleton()->getUrl(self::LONG_NAME), '/');
     }
@@ -58,7 +61,8 @@ class CRM_Politicaldata_ExtensionUtil {
    *   Ex: '/var/www/example.org/sites/default/ext/org.example.foo'.
    *   Ex: '/var/www/example.org/sites/default/ext/org.example.foo/css/foo.css'.
    */
-  public static function path($file = NULL) {
+  public static function path($file = NULL)
+  {
     // return CRM_Core_Resources::singleton()->getPath(self::LONG_NAME, $file);
     return __DIR__ . ($file === NULL ? '' : (DIRECTORY_SEPARATOR . $file));
   }
@@ -71,10 +75,10 @@ class CRM_Politicaldata_ExtensionUtil {
    * @return string
    *   Ex: 'CRM_Foo_Page_HelloWorld'.
    */
-  public static function findClass($suffix) {
+  public static function findClass($suffix)
+  {
     return self::CLASS_PREFIX . '_' . str_replace('\\', '_', $suffix);
   }
-
 }
 
 use CRM_Politicaldata_ExtensionUtil as E;
@@ -84,22 +88,22 @@ use CRM_Politicaldata_ExtensionUtil as E;
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config
  */
-function _politicaldata_civix_civicrm_config(&$config = NULL) {
+function _politicaldata_civix_civicrm_config(&$config = NULL)
+{
   static $configured = FALSE;
   if ($configured) {
     return;
   }
   $configured = TRUE;
 
-  $template =& CRM_Core_Smarty::singleton();
+  $template = &CRM_Core_Smarty::singleton();
 
   $extRoot = dirname(__FILE__) . DIRECTORY_SEPARATOR;
   $extDir = $extRoot . 'templates';
 
   if (is_array($template->template_dir)) {
     array_unshift($template->template_dir, $extDir);
-  }
-  else {
+  } else {
     $template->template_dir = [$extDir, $template->template_dir];
   }
 
@@ -114,7 +118,8 @@ function _politicaldata_civix_civicrm_config(&$config = NULL) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_xmlMenu
  */
-function _politicaldata_civix_civicrm_xmlMenu(&$files) {
+function _politicaldata_civix_civicrm_xmlMenu(&$files)
+{
   foreach (_politicaldata_civix_glob(__DIR__ . '/xml/Menu/*.xml') as $file) {
     $files[] = $file;
   }
@@ -125,7 +130,8 @@ function _politicaldata_civix_civicrm_xmlMenu(&$files) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_install
  */
-function _politicaldata_civix_civicrm_install() {
+function _politicaldata_civix_civicrm_install()
+{
   _politicaldata_civix_civicrm_config();
   if ($upgrader = _politicaldata_civix_upgrader()) {
     $upgrader->onInstall();
@@ -137,7 +143,8 @@ function _politicaldata_civix_civicrm_install() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_postInstall
  */
-function _politicaldata_civix_civicrm_postInstall() {
+function _politicaldata_civix_civicrm_postInstall()
+{
   _politicaldata_civix_civicrm_config();
   if ($upgrader = _politicaldata_civix_upgrader()) {
     if (is_callable([$upgrader, 'onPostInstall'])) {
@@ -151,7 +158,8 @@ function _politicaldata_civix_civicrm_postInstall() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_uninstall
  */
-function _politicaldata_civix_civicrm_uninstall() {
+function _politicaldata_civix_civicrm_uninstall()
+{
   _politicaldata_civix_civicrm_config();
   if ($upgrader = _politicaldata_civix_upgrader()) {
     $upgrader->onUninstall();
@@ -163,7 +171,8 @@ function _politicaldata_civix_civicrm_uninstall() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_enable
  */
-function _politicaldata_civix_civicrm_enable() {
+function _politicaldata_civix_civicrm_enable()
+{
   _politicaldata_civix_civicrm_config();
   if ($upgrader = _politicaldata_civix_upgrader()) {
     if (is_callable([$upgrader, 'onEnable'])) {
@@ -178,7 +187,8 @@ function _politicaldata_civix_civicrm_enable() {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_disable
  * @return mixed
  */
-function _politicaldata_civix_civicrm_disable() {
+function _politicaldata_civix_civicrm_disable()
+{
   _politicaldata_civix_civicrm_config();
   if ($upgrader = _politicaldata_civix_upgrader()) {
     if (is_callable([$upgrader, 'onDisable'])) {
@@ -199,7 +209,8 @@ function _politicaldata_civix_civicrm_disable() {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_upgrade
  */
-function _politicaldata_civix_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
+function _politicaldata_civix_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL)
+{
   if ($upgrader = _politicaldata_civix_upgrader()) {
     return $upgrader->onUpgrade($op, $queue);
   }
@@ -208,11 +219,11 @@ function _politicaldata_civix_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL
 /**
  * @return CRM_Politicaldata_Upgrader
  */
-function _politicaldata_civix_upgrader() {
+function _politicaldata_civix_upgrader()
+{
   if (!file_exists(__DIR__ . '/CRM/Politicaldata/Upgrader.php')) {
     return NULL;
-  }
-  else {
+  } else {
     return CRM_Politicaldata_Upgrader_Base::instance();
   }
 }
@@ -228,7 +239,8 @@ function _politicaldata_civix_upgrader() {
  *
  * @return array
  */
-function _politicaldata_civix_find_files($dir, $pattern) {
+function _politicaldata_civix_find_files($dir, $pattern)
+{
   if (is_callable(['CRM_Utils_File', 'findFiles'])) {
     return CRM_Utils_File::findFiles($dir, $pattern);
   }
@@ -246,8 +258,7 @@ function _politicaldata_civix_find_files($dir, $pattern) {
       while (FALSE !== ($entry = readdir($dh))) {
         $path = $subdir . DIRECTORY_SEPARATOR . $entry;
         if ($entry[0] == '.') {
-        }
-        elseif (is_dir($path)) {
+        } elseif (is_dir($path)) {
           $todos[] = $path;
         }
       }
@@ -264,7 +275,8 @@ function _politicaldata_civix_find_files($dir, $pattern) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_managed
  */
-function _politicaldata_civix_civicrm_managed(&$entities) {
+function _politicaldata_civix_civicrm_managed(&$entities)
+{
   $mgdFiles = _politicaldata_civix_find_files(__DIR__, '*.mgd.php');
   sort($mgdFiles);
   foreach ($mgdFiles as $file) {
@@ -290,7 +302,8 @@ function _politicaldata_civix_civicrm_managed(&$entities) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_caseTypes
  */
-function _politicaldata_civix_civicrm_caseTypes(&$caseTypes) {
+function _politicaldata_civix_civicrm_caseTypes(&$caseTypes)
+{
   if (!is_dir(__DIR__ . '/xml/case')) {
     return;
   }
@@ -318,7 +331,8 @@ function _politicaldata_civix_civicrm_caseTypes(&$caseTypes) {
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_angularModules
  */
-function _politicaldata_civix_civicrm_angularModules(&$angularModules) {
+function _politicaldata_civix_civicrm_angularModules(&$angularModules)
+{
   if (!is_dir(__DIR__ . '/ang')) {
     return;
   }
@@ -339,7 +353,8 @@ function _politicaldata_civix_civicrm_angularModules(&$angularModules) {
  *
  * Find any and return any files matching "*.theme.php"
  */
-function _politicaldata_civix_civicrm_themes(&$themes) {
+function _politicaldata_civix_civicrm_themes(&$themes)
+{
   $files = _politicaldata_civix_glob(__DIR__ . '/*.theme.php');
   foreach ($files as $file) {
     $themeMeta = include $file;
@@ -366,7 +381,8 @@ function _politicaldata_civix_civicrm_themes(&$themes) {
  *
  * @return array
  */
-function _politicaldata_civix_glob($pattern) {
+function _politicaldata_civix_glob($pattern)
+{
   $result = glob($pattern);
   return is_array($result) ? $result : [];
 }
@@ -382,7 +398,8 @@ function _politicaldata_civix_glob($pattern) {
  *
  * @return bool
  */
-function _politicaldata_civix_insert_navigation_menu(&$menu, $path, $item) {
+function _politicaldata_civix_insert_navigation_menu(&$menu, $path, $item)
+{
   // If we are done going down the path, insert menu
   if (empty($path)) {
     $menu[] = [
@@ -392,8 +409,7 @@ function _politicaldata_civix_insert_navigation_menu(&$menu, $path, $item) {
       ], $item),
     ];
     return TRUE;
-  }
-  else {
+  } else {
     // Find an recurse into the next level down
     $found = FALSE;
     $path = explode('/', $path);
@@ -413,7 +429,8 @@ function _politicaldata_civix_insert_navigation_menu(&$menu, $path, $item) {
 /**
  * (Delegated) Implements hook_civicrm_navigationMenu().
  */
-function _politicaldata_civix_navigationMenu(&$nodes) {
+function _politicaldata_civix_navigationMenu(&$nodes)
+{
   if (!is_callable(['CRM_Core_BAO_Navigation', 'fixNavigationMenu'])) {
     _politicaldata_civix_fixNavigationMenu($nodes);
   }
@@ -423,9 +440,10 @@ function _politicaldata_civix_navigationMenu(&$nodes) {
  * Given a navigation menu, generate navIDs for any items which are
  * missing them.
  */
-function _politicaldata_civix_fixNavigationMenu(&$nodes) {
+function _politicaldata_civix_fixNavigationMenu(&$nodes)
+{
   $maxNavID = 1;
-  array_walk_recursive($nodes, function($item, $key) use (&$maxNavID) {
+  array_walk_recursive($nodes, function ($item, $key) use (&$maxNavID) {
     if ($key === 'navID') {
       $maxNavID = max($maxNavID, $item);
     }
@@ -433,7 +451,8 @@ function _politicaldata_civix_fixNavigationMenu(&$nodes) {
   _politicaldata_civix_fixNavigationMenuItems($nodes, $maxNavID, NULL);
 }
 
-function _politicaldata_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $parentID) {
+function _politicaldata_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $parentID)
+{
   $origKeys = array_keys($nodes);
   foreach ($origKeys as $origKey) {
     if (!isset($nodes[$origKey]['attributes']['parentID']) && $parentID !== NULL) {
@@ -458,7 +477,8 @@ function _politicaldata_civix_fixNavigationMenuItems(&$nodes, &$maxNavID, $paren
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterSettingsFolders
  */
-function _politicaldata_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
+function _politicaldata_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL)
+{
   $settingsDir = __DIR__ . DIRECTORY_SEPARATOR . 'settings';
   if (!in_array($settingsDir, $metaDataFolders) && is_dir($settingsDir)) {
     $metaDataFolders[] = $settingsDir;
@@ -472,6 +492,7 @@ function _politicaldata_civix_civicrm_alterSettingsFolders(&$metaDataFolders = N
  *
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_entityTypes
  */
-function _politicaldata_civix_civicrm_entityTypes(&$entityTypes) {
+function _politicaldata_civix_civicrm_entityTypes(&$entityTypes)
+{
   $entityTypes = array_merge($entityTypes, []);
 }
