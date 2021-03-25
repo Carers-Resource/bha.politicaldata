@@ -144,18 +144,12 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
 
   //bail if no postcode
   if (!isset($postcode) or empty($postcode)) {
-  	if (!isset($postcode) or empty($postcode)) { 
-  if (!isset($postcode) or empty($postcode)) {
     return;
   }
 
   //bail if the country explicitly isn't the UK. If there isn't a country try anyway
   if (isset($country) and $country != 'null' and $country != 1226) {
     return;
-	 		return; 
-    return;
-  }
-	 	} 
   }
 
 
@@ -194,18 +188,12 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
     $url = 'https://mapit.mysociety.org/point/4326/' . $long . ',' . $lat;
 
     //if api key, use it. Otherwise this'll default to the no-api-key 50/day version
-			//if api key, use it. Otherwise this'll default to the no-api-key 50/day version	
-    //if api key, use it. Otherwise this'll default to the no-api-key 50/day version
     if ($apikey) {
-      $url .= '?api_key=' . $apikey;
-				$url .= '?api_key=' . $apikey; 
       $url .= '?api_key=' . $apikey;
     }
   } else {
     $url = 'https://mapit.mysociety.org/postcode/' . $postcode;
     if ($apikey) {
-      $url .= '?api_key=' . $apikey;
-				$url .= '?api_key=' . $apikey; 
       $url .= '?api_key=' . $apikey;
     }
   }
@@ -294,8 +282,6 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
   //starts working for latlong at this point, as latlong lookups only have the 'areas' array
   if ($politicaldata['areas']) {
     $areas = $politicaldata['areas'];
-			$areas = $politicaldata['areas'];	
-    $areas = $politicaldata['areas'];
   } else {
     $areas = $politicaldata;
   }
@@ -306,8 +292,6 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
 
   // assign to the custom fields
 
-  //actually save to DB
-    //actually save to DB   		
   //actually save to DB
   $result = civicrm_api3('CustomValue', 'create', [
     'entity_id' => $objectref->contact_id,
@@ -327,23 +311,25 @@ function mapAreaTypesToNames($areas)
   return $map;
 }
 
-function politicaldata_array_key_exists_r($needle, $haystack) {
-    $result = array_key_exists($needle, $haystack);
-    if ($result) return $result;
-    foreach ($haystack as $v) {
-        if (is_array($v)) {
-            $result = politicaldata_array_key_exists_r($needle, $v);
-        }
-        if ($result) return $result;
+function politicaldata_array_key_exists_r($needle, $haystack)
+{
+  $result = array_key_exists($needle, $haystack);
+  if ($result) return $result;
+  foreach ($haystack as $v) {
+    if (is_array($v)) {
+      $result = politicaldata_array_key_exists_r($needle, $v);
     }
-    return $result;
+    if ($result) return $result;
+  }
+  return $result;
 }
 
-function politicaldata_searchForType($id, $array) {
-   foreach ($array as $key => $val) {
-       if ($val['type'] === $id) {
-           return $key;
-       }
-   }
-   return null;
+function politicaldata_searchForType($id, $array)
+{
+  foreach ($array as $key => $val) {
+    if ($val['type'] === $id) {
+      return $key;
+    }
+  }
+  return null;
 }
