@@ -120,6 +120,12 @@ function politicaldata_civicrm_alterSettingsFolders(&$metaDataFolders = NULL)
 function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
 {
 
+  //custom field IDs for wards, local authority, CCG and constituency
+  defined('MAPIT_WARD') ?: define('MAPIT_WARD', '15');
+  defined('MAPIT_LA') ?: define('MAPIT_LA', '17');
+  defined('MAPIT_CCG') ?: define('MAPIT_CCG', '18');
+  defined('MAPIT_CONSTITUENCY') ?: define('MAPIT_CONSTITUENCY', '19');
+
 		$contact_id = $objectref->contact_id;
 		$postcode = $objectref->postal_code;
 		$country = $objectref->country_id;
