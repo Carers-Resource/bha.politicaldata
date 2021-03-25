@@ -304,25 +304,20 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
 
   $ccg = $areaNames['CCG'];
 
-		 $customParams = array(
-			 "id" => $contact_id,
-			 "sequential" => 1,
-			 "custom_308" => $constituency, //Parliamentary Constituency
-			 "custom_305" => $highestla, //Highest Local Authority
-			 "custom_306" => $secondhighestla, //Second Highest Local Authority
-			 "custom_304" => $ward, //Ward
-			 "custom_307" => $regionalauthority, //Regional Authority
-			 "custom_310" => $welshassemblycon, //Welsh Assembly Constituency
-	 		 "custom_311" => $welshassemblyregion, //Welsh Assembly Region
-	 		 "custom_312" => $scottishparlcon, //Scottish Parliamentary Contituency
-	 		 "custom_313" => $scottishparlreg, //Scottish Parliament Region
-	 		 "custom_314" => $londonassembly, //London Assembly Constituency
-	 		 "custom_734" => $ukcountry, //UK Country
-		 );
-              
+  // assign to the custom fields
+
+  //actually save to DB
     //actually save to DB   		
-		$result = civicrm_api3('Contact', 'create', $customParams);
-	}
+  //actually save to DB
+  $result = civicrm_api3('CustomValue', 'create', [
+    'entity_id' => $objectref->contact_id,
+    'custom_' . (MAPIT_WARD) => $ward,
+    'custom_' . (MAPIT_LA) => $la,
+    'custom_' . (MAPIT_CCG) => $ccg,
+    'custom_' . (MAPIT_CONSTITUENCY) => $constituency,
+  ]);
+}
+
 }
 
 function politicaldata_array_key_exists_r($needle, $haystack) {
