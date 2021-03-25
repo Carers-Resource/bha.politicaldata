@@ -117,9 +117,9 @@ function politicaldata_civicrm_alterSettingsFolders(&$metaDataFolders = NULL)
   _politicaldata_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
-function politicaldata_civicrm_post($op, $objectName, $id, &$objectref){
-	if ($objectName == 'Address' and ($op == 'create' or $op == 'edit' or op == 'restore')) {
-			
+function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
+{
+
 		$contact_id = $objectref->contact_id;
 		$postcode = $objectref->postal_code;
 		$country = $objectref->country_id;
