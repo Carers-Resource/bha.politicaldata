@@ -318,6 +318,13 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
   ]);
 }
 
+function mapAreaTypesToNames($areas)
+{
+  $map = [];
+  foreach ($areas as $area) {
+    $map[$area['type']] = $area['name'];
+  }
+  return $map;
 }
 
 function politicaldata_array_key_exists_r($needle, $haystack) {
