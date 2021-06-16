@@ -8,7 +8,7 @@
     <author>Gav Massingham</author>
     <email>web@carersresource.org</email>
   </maintainer>
-  <version>1.1</version>
+  <version>1.1.1</version>
   <develStage>Development</develStage>
   <compatibility>
     <ver>4.4</ver>

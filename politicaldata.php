@@ -121,10 +121,11 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
 {
 
   //custom field IDs for wards, local authority, CCG and constituency
-  defined('MAPIT_WARD') ?: define('MAPIT_WARD', '15');
-  defined('MAPIT_LA') ?: define('MAPIT_LA', '17');
-  defined('MAPIT_CCG') ?: define('MAPIT_CCG', '18');
-  defined('MAPIT_CONSTITUENCY') ?: define('MAPIT_CONSTITUENCY', '19');
+  defined('MAPIT_WARD') ?: define('MAPIT_WARD', '12');
+  defined('MAPIT_LA') ?: define('MAPIT_LA', '249');
+  defined('MAPIT_DISTRICT') ?: define('MAPIT_DISTRICT', '296');
+  defined('MAPIT_CCG') ?: define('MAPIT_CCG', '250');
+  defined('MAPIT_CONSTITUENCY') ?: define('MAPIT_CONSTITUENCY', '11');
 
   if ($objectName != 'Address') {
     return;
@@ -213,6 +214,7 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
   $result = curl_exec($ch);
   //convert result json to array
   $politicaldata = json_decode($result, true);
+  dvm($politicaldata);
 
   //bail if no data
   if (!$politicaldata) {
@@ -228,53 +230,45 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
     return;
   }
 
+
   //get appropriate ward and council, depending on whether it's a unitary authority
   //TODO: this doesn't work for lat/long lookups
-  $isward = 1;
+  $isward = true;
+  $wardID = $politicaldata['shortcuts']['ward'];
   if (politicaldata_array_key_exists_r('county', $politicaldata)) {
     $isward = 0;
-    $wardcountyid = $politicaldata['shortcuts']['ward']['county'];
-    $warddistrictid = $politicaldata['shortcuts']['ward']['district'];
-  } else {
-    $wardid = $politicaldata['shortcuts']['ward'];
+    $warddistrictID = $politicaldata['shortcuts']['ward']['district'];
   }
 
-  $iscouncil = 1;
-  $councilcountyid = '000';
+  $iscouncil = true;
+  $countycouncilID =  $politicaldata['shortcuts']['council'];
   if (politicaldata_array_key_exists_r('county', $politicaldata)) {
-    $iscouncil = 0;
-    $councilcountyid = $politicaldata['shortcuts']['council']['county'];
-    $councildistrictid = $politicaldata['shortcuts']['council']['district'];
-  } else {
-    $councilid = $politicaldata['shortcuts']['council'];
+    $iscouncil = false;
+    $countycouncilID = $politicaldata['shortcuts']['council']['county'];
+    $districtcouncilID = $politicaldata['shortcuts']['council']['district'];
+    dvm($iscouncil);
   }
 
   //Parliamentary Constituency
-  $constituencyid = $politicaldata['shortcuts']['WMC'];
+  $constituencyID = $politicaldata['shortcuts']['WMC'];
 
 
   //assign values for Council and Local Authority
-  $constituency = $politicaldata['areas'][$constituencyid]['name'];
-  if (array_key_exists($councilcountyid, $politicaldata['areas'])) {
-    $highestla = $politicaldata['areas'][$councilcountyid]['name'];
+  $constituency = $politicaldata['areas'][$constituencyID]['name'];
+  if (array_key_exists($countycouncilID, $politicaldata['areas'])) {
+    $countycouncil = $politicaldata['areas'][$countycouncilID]['name'];
   }
 
-  if ($iscouncil == 1) {
-    $highestla = $politicaldata['areas'][$councilid]['name'];
+  $districtcouncil = 'N/A';
+
+  if (!$iscouncil) {
+    $districtcouncil = $politicaldata['areas'][$districtcouncilID]['name'];
   }
 
-  if ($iscouncil == 1) {
-    $secondhighestla = '';
-  } else {
-    $secondhighestla = $politicaldata['areas'][$councildistrictid]['name'];
-  }
+  $ward = $politicaldata['areas'][$warddistrictID]['name'];
 
-  $la = !isset($secondhighestla) ? $secondhighestla : $highestla;
-
-  if ($isward == 1) {
-    $ward = $politicaldata['areas'][$wardid]['name'];
-  } else {
-    $ward = $politicaldata['areas'][$warddistrictid]['name'];
+  if ($isward) {
+    $ward = $politicaldata['areas'][$wardID]['name'];
   }
 
 
@@ -296,7 +290,8 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
   $result = civicrm_api3('CustomValue', 'create', [
     'entity_id' => $objectref->contact_id,
     'custom_' . (MAPIT_WARD) => $ward,
-    'custom_' . (MAPIT_LA) => $la,
+    'custom_' . (MAPIT_LA) => $countycouncil,
+    'custom_' . (MAPIT_DISTRICT) => $districtcouncil,
     'custom_' . (MAPIT_CCG) => $ccg,
     'custom_' . (MAPIT_CONSTITUENCY) => $constituency,
   ]);
@@ -314,7 +309,9 @@ function mapAreaTypesToNames($areas)
 function politicaldata_array_key_exists_r($needle, $haystack)
 {
   $result = array_key_exists($needle, $haystack);
-  if ($result) return $result;
+  if ($result) {
+    return $result;
+  }
   foreach ($haystack as $v) {
     if (is_array($v)) {
       $result = politicaldata_array_key_exists_r($needle, $v);
