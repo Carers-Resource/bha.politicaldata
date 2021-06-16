@@ -214,7 +214,6 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
   $result = curl_exec($ch);
   //convert result json to array
   $politicaldata = json_decode($result, true);
-  dvm($politicaldata);
 
   //bail if no data
   if (!$politicaldata) {
@@ -233,44 +232,25 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
 
   //get appropriate ward and council, depending on whether it's a unitary authority
   //TODO: this doesn't work for lat/long lookups
-  $isward = true;
   $wardID = $politicaldata['shortcuts']['ward'];
-  if (politicaldata_array_key_exists_r('county', $politicaldata)) {
-    $isward = 0;
-    $warddistrictID = $politicaldata['shortcuts']['ward']['district'];
-  }
-
-  $iscouncil = true;
   $countycouncilID =  $politicaldata['shortcuts']['council'];
-  if (politicaldata_array_key_exists_r('county', $politicaldata)) {
-    $iscouncil = false;
-    $countycouncilID = $politicaldata['shortcuts']['council']['county'];
-    $districtcouncilID = $politicaldata['shortcuts']['council']['district'];
-    dvm($iscouncil);
-  }
-
-  //Parliamentary Constituency
-  $constituencyID = $politicaldata['shortcuts']['WMC'];
-
-
-  //assign values for Council and Local Authority
-  $constituency = $politicaldata['areas'][$constituencyID]['name'];
-  if (array_key_exists($countycouncilID, $politicaldata['areas'])) {
-    $countycouncil = $politicaldata['areas'][$countycouncilID]['name'];
-  }
-
   $districtcouncil = 'N/A';
 
-  if (!$iscouncil) {
+  if (politicaldata_array_key_exists_r('county', $politicaldata)) {
+    $wardID = $politicaldata['shortcuts']['ward']['district'];
+    $countycouncilID = $politicaldata['shortcuts']['council']['county'];
+    $districtcouncilID = $politicaldata['shortcuts']['council']['district'];
     $districtcouncil = $politicaldata['areas'][$districtcouncilID]['name'];
   }
 
-  $ward = $politicaldata['areas'][$warddistrictID]['name'];
-
-  if ($isward) {
-    $ward = $politicaldata['areas'][$wardID]['name'];
+  if (array_key_exists($countycouncilID, $politicaldata['areas'])) {
+    $countycouncil = $politicaldata['areas'][$countycouncilID]['name'];
   }
+  $ward = $politicaldata['areas'][$wardID]['name'];
 
+  //Parliamentary Constituency
+  $constituencyID = $politicaldata['shortcuts']['WMC'];
+  $constituency = $politicaldata['areas'][$constituencyID]['name'];
 
   //for all others it's identical (afaik), so can search directly
   //starts working for latlong at this point, as latlong lookups only have the 'areas' array
