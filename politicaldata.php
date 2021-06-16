@@ -123,7 +123,7 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
   //custom field IDs for wards, local authority, CCG and constituency
   defined('MAPIT_WARD') ?: define('MAPIT_WARD', '12');
   defined('MAPIT_LA') ?: define('MAPIT_LA', '249');
-  defined('MAPIT_DISTRICT') ?: define('MAPIT_DISTRICT', '296');
+  defined('MAPIT_DISTRICT') ?: define('MAPIT_DISTRICT', '269');
   defined('MAPIT_CCG') ?: define('MAPIT_CCG', '250');
   defined('MAPIT_CONSTITUENCY') ?: define('MAPIT_CONSTITUENCY', '11');
 
