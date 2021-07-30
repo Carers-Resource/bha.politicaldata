@@ -140,8 +140,10 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
   }
 
   $contact_id = $objectref->contact_id;
-  $postcode = $objectref->postal_code;
+  $postcode = str_replace(' ', '', $objectref->postal_code);
   $country = $objectref->country_id;
+
+  Civi::log()->info('Postcode: ' . $postcode);
 
   //bail if no postcode
   if (!isset($postcode) or empty($postcode)) {
@@ -212,22 +214,31 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
   curl_setopt($ch, CURLOPT_URL, $url);
   //execute
   $result = curl_exec($ch);
+  Civi::log()->info($result);
   //convert result json to array
   $politicaldata = json_decode($result, true);
 
   //bail if no data
   if (!$politicaldata) {
     error_log('mapit returning no data');
+    Civi::log()->error('Mapit returned no data');
 
     if (curl_errno($ch)) {
       error_log('Curl error: ' . curl_error($ch));
+      Civi::log()->error('Curl error: ' . curl_error($ch));
     }
 
     $foo = print_r(curl_getinfo($ch), true);
     error_log($foo);
+    Civi::log()->error($foo);
 
     return;
   }
+
+  if (array_key_exists("error", $politicaldata)) {
+    CRM_Core_Session::setStatus("Mapit service returned an error: " . $politicaldata["error"], "Mapit Error", "error");
+    return;
+  };
 
 
   //get appropriate ward and council, depending on whether it's a unitary authority
@@ -275,6 +286,7 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
     'custom_' . (MAPIT_CCG) => $ccg,
     'custom_' . (MAPIT_CONSTITUENCY) => $constituency,
   ]);
+  Civi::log()->info('Wrote Mapit data');
 }
 
 function mapAreaTypesToNames($areas)
