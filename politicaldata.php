@@ -158,7 +158,7 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
 
   $politicaldata = curlGetMapItData($url);
 
-  if !$politicaldata { return; }
+  if (!$politicaldata) { return; }
 
   //get appropriate ward and council, depending on whether it's a unitary authority
   $wardID = $politicaldata['shortcuts']['ward'];
@@ -227,7 +227,7 @@ function curlGetMapItData($url) {
     error_log('mapit returned no data');
     Civi::log()->error('Mapit returned no data');
 
-    return; };
+    return; }
   
   // if (curl_errno($ch)) {
   //     error_log('Curl error: ' . curl_error($ch));
@@ -237,7 +237,7 @@ function curlGetMapItData($url) {
   if (array_key_exists("error", $politicaldata)) {
     CRM_Core_Session::setStatus("Mapit service returned an error: " . $politicaldata["error"], "Mapit Error", "error");
     return;
-  };
+  }
   
   return $politicaldata;
 }
