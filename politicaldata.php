@@ -119,7 +119,6 @@ function politicaldata_civicrm_alterSettingsFolders(&$metaDataFolders = NULL)
 
 function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
 {
-
   //custom field IDs for wards, local authority, CCG and constituency
   defined('MAPIT_WARD') ?: define('MAPIT_WARD', '12');
   defined('MAPIT_LA') ?: define('MAPIT_LA', '249');
@@ -127,39 +126,22 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
   defined('MAPIT_CCG') ?: define('MAPIT_CCG', '250');
   defined('MAPIT_CONSTITUENCY') ?: define('MAPIT_CONSTITUENCY', '11');
 
-  if ($objectName != 'Address') {
-    return;
-  }
-
-  if (!in_array($op, array('create', 'edit'))) {
-    return;
-  }
-
-  if ($objectref->is_primary != 1) {
-    return;
-  }
+  if ($objectName != 'Address') { return; }
+  if (!in_array($op, array('create', 'edit'))) { return; }
+  if ($objectref->is_primary != 1) { return; }
 
   $contact_id = $objectref->contact_id;
   $postcode = str_replace(' ', '', $objectref->postal_code);
   $country = $objectref->country_id;
 
-  Civi::log()->info('Postcode: ' . $postcode);
-
-  //bail if no postcode
-  if (!isset($postcode) or empty($postcode)) {
-    return;
-  }
+   //bail if no postcode
+  if (!isset($postcode) or empty($postcode)) { return; }
 
   //bail if the country explicitly isn't the UK. If there isn't a country try anyway
-  if (isset($country) and $country != 'null' and $country != 1226) {
-    return;
-  }
-
+  if (isset($country) and $country != 'null' and $country != 1226) { return; }
 
   //bail if there's no contact ID (creating locations on the Manage Event page seems to do this)
-  if (!$contact_id) {
-    return;
-  }
+  if (!$contact_id) { return; }
 
   //get API key from db (set via civicrm/mapit/settings)
   $result = civicrm_api3('Setting', 'get', array(
@@ -169,13 +151,10 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
 
   $apikey = array_key_exists('mapitkey', $result['values'][0]) ? $result['values'][0]['mapitkey'] : '';
 
-  //check whether we're using lat/long or postcode
-  $usingLatLong = false;
-
   $url = 'https://mapit.mysociety.org/postcode/' . $postcode;
-    if ($apikey) {
+  if ($apikey) {
       $url .= '?api_key=' . $apikey;
-    }
+  }
 
   $politicaldata = curlGetMapItData($url);
 
@@ -228,7 +207,6 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
     'custom_' . (MAPIT_CCG) => $ccg,
     'custom_' . (MAPIT_CONSTITUENCY) => $constituency,
   ]);
-  Civi::log()->info('Wrote Mapit data');
 }
 
 function curlGetMapItData($url) {
@@ -249,7 +227,7 @@ function curlGetMapItData($url) {
     error_log('mapit returned no data');
     Civi::log()->error('Mapit returned no data');
 
-    return;}
+    return; };
   
   // if (curl_errno($ch)) {
   //     error_log('Curl error: ' . curl_error($ch));
@@ -261,7 +239,7 @@ function curlGetMapItData($url) {
     return;
   };
   
-  return $politicaldata
+  return $politicaldata;
 }
 
 function mapAreaTypesToNames($areas)
