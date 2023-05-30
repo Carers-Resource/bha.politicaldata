@@ -172,91 +172,33 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
   //check whether we're using lat/long or postcode
   $usingLatLong = false;
 
-
-  //BHA: check if it's a local group
-  $contactType = civicrm_api3('Contact', 'getsingle', array(
-    'sequential' => 1,
-    'return' => "contact_sub_type",
-    'id' => $contact_id,
-  ));
-  $contactSubType = $contactType['contact_sub_type'];
-  if ($contactSubType == 'LocalGroup') {
-    $usingLatLong = true;
-  }
-
-  if ($usingLatLong) {
-
-    $lat = $objectref->geo_code_1;
-    $long = $objectref->geo_code_2;
-    $url = 'https://mapit.mysociety.org/point/4326/' . $long . ',' . $lat;
-
-    //if api key, use it. Otherwise this'll default to the no-api-key 50/day version
+  $url = 'https://mapit.mysociety.org/postcode/' . $postcode;
     if ($apikey) {
       $url .= '?api_key=' . $apikey;
     }
-  } else {
-    $url = 'https://mapit.mysociety.org/postcode/' . $postcode;
-    if ($apikey) {
-      $url .= '?api_key=' . $apikey;
-    }
-  }
 
+  $politicaldata = curlGetMapItData($url);
 
-  //fetch data from mapit
-
-  //Initiate curl
-  $ch = curl_init();
-  //Return the response as a string (if false it prints the response)
-  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-  //set 4 seconds max wait time
-  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 4);
-  //set the url
-  curl_setopt($ch, CURLOPT_URL, $url);
-  //execute
-  $result = curl_exec($ch);
-  Civi::log()->info($result);
-  //convert result json to array
-  $politicaldata = json_decode($result, true);
-
-  //bail if no data
-  if (!$politicaldata) {
-    error_log('mapit returning no data');
-    Civi::log()->error('Mapit returned no data');
-
-    if (curl_errno($ch)) {
-      error_log('Curl error: ' . curl_error($ch));
-      Civi::log()->error('Curl error: ' . curl_error($ch));
-    }
-
-    $foo = print_r(curl_getinfo($ch), true);
-    error_log($foo);
-    Civi::log()->error($foo);
-
-    return;
-  }
-
-  if (array_key_exists("error", $politicaldata)) {
-    CRM_Core_Session::setStatus("Mapit service returned an error: " . $politicaldata["error"], "Mapit Error", "error");
-    return;
-  };
-
+  if !$politicaldata { return; }
 
   //get appropriate ward and council, depending on whether it's a unitary authority
-  //TODO: this doesn't work for lat/long lookups
   $wardID = $politicaldata['shortcuts']['ward'];
-  $countycouncilID =  $politicaldata['shortcuts']['council'];
-  $districtcouncil = 'N/A';
+  $councilID =  $politicaldata['shortcuts']['council'];
+
+  if (array_key_exists($councilID, $politicaldata['areas'])) {
+      $countycouncil = $politicaldata['areas'][$councilID]['name'];
+      if $politicaldata['areas'][$councilID]['generation_low'] =< 48 {
+              $politicaldata = curlMapItData($url . '&generation=48' )
+                             }
+  }
 
   if (politicaldata_array_key_exists_r('county', $politicaldata)) {
     $wardID = $politicaldata['shortcuts']['ward']['district'];
-    $countycouncilID = $politicaldata['shortcuts']['council']['county'];
     $districtcouncilID = $politicaldata['shortcuts']['council']['district'];
     $districtcouncil = $politicaldata['areas'][$districtcouncilID]['name'];
   }
 
-  if (array_key_exists($countycouncilID, $politicaldata['areas'])) {
-    $countycouncil = $politicaldata['areas'][$countycouncilID]['name'];
-  }
+
   $ward = $politicaldata['areas'][$wardID]['name'];
 
   //Parliamentary Constituency
@@ -287,6 +229,39 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
     'custom_' . (MAPIT_CONSTITUENCY) => $constituency,
   ]);
   Civi::log()->info('Wrote Mapit data');
+}
+
+function curlGetMapItData($url) {
+  //Initiate curl
+  $ch = curl_init();
+  //Return the response as a string (if false it prints the response)
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+  //set 4 seconds max wait time
+  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 4);
+  //set the url
+  curl_setopt($ch, CURLOPT_URL, $url);
+  //execute
+  $result = curl_exec($ch);
+  $politicaldata = json_decode($result, true);
+
+  //bail if no data
+  if (!$politicaldata) {
+    error_log('mapit returned no data');
+    Civi::log()->error('Mapit returned no data');
+
+    return;}
+  
+  // if (curl_errno($ch)) {
+  //     error_log('Curl error: ' . curl_error($ch));
+  //     Civi::log()->error('Curl error: ' . curl_error($ch));
+  // }
+
+  if (array_key_exists("error", $politicaldata)) {
+    CRM_Core_Session::setStatus("Mapit service returned an error: " . $politicaldata["error"], "Mapit Error", "error");
+    return;
+  };
+  
+  return $politicaldata
 }
 
 function mapAreaTypesToNames($areas)
