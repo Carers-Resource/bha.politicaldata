@@ -166,9 +166,9 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
 
   if (array_key_exists($councilID, $politicaldata['areas'])) {
       $countycouncil = $politicaldata['areas'][$councilID]['name'];
-      if $politicaldata['areas'][$councilID]['generation_low'] =< 48 {
-              $politicaldata = curlMapItData($url . '&generation=48' )
-                             }
+      // if $politicaldata['areas'][$councilID]['generation_low'] =< 48 {
+      //         $politicaldata = curlMapItData($url . '&generation=48' )
+      //                        }
   }
 
   if (politicaldata_array_key_exists_r('county', $politicaldata)) {
