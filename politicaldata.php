@@ -168,7 +168,7 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
       $countycouncil = $politicaldata['areas'][$councilID]['name'];
       if ($politicaldata['areas'][$councilID]['generation_low'] > 48) {
               $url .= '&generation=48';
-              //$politicaldata = curlGetMapItData($url);
+              $politicaldata = curlGetMapItData($url);
           }
   }
 
