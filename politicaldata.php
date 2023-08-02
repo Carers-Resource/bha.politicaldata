@@ -168,14 +168,14 @@ function politicaldata_civicrm_postCommit($op, $objectName, $id, &$objectref)
       $countycouncil = $politicaldata['areas'][$councilID]['name'];
       if ($politicaldata['areas'][$councilID]['generation_low'] > 48) {
               $url .= '&generation=48';
-              $politicaldata = curlGetMapItData($url);
+              $politicaldata_48 = curlGetMapItData($url);
           }
   }
 
-  if (politicaldata_array_key_exists_r('county', $politicaldata)) {
-    $wardID = $politicaldata['shortcuts']['ward']['district'];
-    $districtcouncilID = $politicaldata['shortcuts']['council']['district'];
-    $districtcouncil = $politicaldata['areas'][$districtcouncilID]['name'];
+  if (politicaldata_array_key_exists_r('county', $politicaldata_48)) {
+    //$wardID = $politicaldata['shortcuts']['ward']['district'];
+    $districtcouncilID = $politicaldata_48['shortcuts']['council']['district'];
+    $districtcouncil = $politicaldata_48['areas'][$districtcouncilID]['name'];
   }
 
 
